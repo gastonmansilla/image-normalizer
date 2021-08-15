@@ -1,17 +1,12 @@
 {
   "parser": "@typescript-eslint/parser",
   "extends": [
-    "plugin:@typescript-eslint/recommended",
+    "react-app",
     "prettier/@typescript-eslint",
     "plugin:prettier/recommended",
     "plugin:import/typescript"
   ],
   "plugins": ["import"],
-  "parserOptions": {
-    "ecmaVersion": 2018,
-    "sourceType": "module",
-    "project": "tsconfig.json"
-  },
   "rules": {
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-use-before-define": ["warn", { "functions": false }],
@@ -21,10 +16,7 @@
       "warn",
       { "ignoreRestSiblings": true }
     ],
-    "@typescript-eslint/explicit-function-return-type": [
-      "warn",
-      { "allowExpressions": true }
-    ],
+    "@typescript-eslint/explicit-function-return-type": "off",
     "import/no-extraneous-dependencies": "error",
     "import/no-cycle": "error",
     "import/no-self-import": "error",
@@ -32,10 +24,18 @@
   },
   "overrides": [
     {
-      "files": ["**/*.stories.*"],
+      "files": [".ts", ".tsx"],
       "rules": {
-        "import/no-anonymous-default-export": "off"
+        "@typescript-eslint/explicit-function-return-type": [
+          "warn",
+          { "allowExpressions": true }
+        ]
       }
     }
-  ]
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "project": "tsconfig.json"
+  }
 }

@@ -1,11 +1,11 @@
 {
-  "name": "avatar-normalizer",
+  "name": "image-normalizer",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "homepage": ".",
   "main": "build/electron/main.js",
   "author": "Gaston Mansilla",
-  "description": "Util for getting avatar images as required for third party apps",
+  "description": "Util for getting images normalized as required for third party apps",
   "build": {
     "extends": null,
     "files": [
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -32,6 +33,7 @@
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-prettier": "^3.1.2",
+    "nanoid": "^2.1.11",
     "prettier": "^1.19.1",
     "react": "^17.0.2",
     "react-avatar-editor": "^12.0.0",
@@ -69,6 +71,7 @@
     ]
   },
   "devDependencies": {
+    "@types/nanoid": "^2.1.0",
     "@types/react-avatar-editor": "^10.3.6",
     "cross-env": "^7.0.3",
     "electron": "^13.1.9",

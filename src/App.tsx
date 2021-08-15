@@ -1,74 +1,163 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import React, {
-  ChangeEventHandler,
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
-import './App.css';
+import React, { useCallback, useRef, useState } from 'react';
+import {
+  Button,
+  createStyles,
+  Grid,
+  makeStyles,
+  Slider,
+  Step,
+  StepContent,
+  StepLabel,
+  Stepper,
+  TextField,
+  Typography,
+} from '@material-ui/core';
 import AvatarEditor from 'react-avatar-editor';
+import { FilePicker } from './Components/FilePicker';
+import { downloadFile } from './util/downloadFile';
+import { GitHub } from '@material-ui/icons';
 
-export function downloadFile(url: string, filename: string, extension: string) {
-  const fullName = `${filename}.${extension}`;
-  // if (navigator.msSaveBlob) {
-  //   // IE 10+
-  //   navigator.msSaveBlob(blob, fullName);
-  // } else {
-  const link = document.createElement('a');
-  if (link.download !== undefined) {
-    // feature detection
-    // Browsers that support HTML5 download attribute
-    link.setAttribute('href', url);
-    link.setAttribute('download', fullName);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-  // }
-}
+const useStyles = makeStyles(theme =>
+  createStyles({
+    editorStep: {
+      height: 200,
+    },
+    footer: {
+      margin: theme.spacing(1, 0),
+    },
+    github: {
+      fill: theme.palette.primary.main,
+      color: theme.palette.primary.main,
+    },
+    root: {
+      height: '100vh',
+      overflow: 'hidden scroll',
+    },
+  }),
+);
 
 const App = () => {
-  const [file, setFile] = useState<File | null>(null);
+  const styles = useStyles();
+  const [file, setFile] = useState<File>();
+  const [scale, setScale] = useState<number>(1.2);
+  const [fileName, setFileName] = useState('0001-');
   const avatarEditor = useRef<AvatarEditor>(null);
 
-  const onImageChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
-    event => {
-      const selectedFile = event.target.files && event.target.files[0];
-      setFile(selectedFile);
+  const onSave = useCallback(() => {
+    if (!file || !avatarEditor.current || !fileName) {
       return;
+    }
+    const scaled = avatarEditor.current.getImageScaledToCanvas();
+    const blob = scaled.toDataURL('jpeg');
+    downloadFile(blob, fileName, 'jpeg');
+  }, [file, fileName]);
+
+  const onScaleChange = useCallback((_, value: number | number[]) => {
+    if (typeof value === 'object') {
+      value = value[0];
+    }
+    setScale(value);
+  }, []);
+
+  const onFileNameChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setFileName(event.target.value);
     },
     [],
   );
 
-  const onSave = useCallback(() => {
-    if (!file || !avatarEditor.current) {
-      return;
-    }
-
-    const scaled = avatarEditor.current.getImageScaledToCanvas();
-    const blob = scaled.toDataURL('jpeg');
-    downloadFile(blob, 'myfile', 'jpeg');
-  }, [file, avatarEditor.current]);
-
   return (
-    <div className="App">
-      <input type="file" onChange={onImageChange} />
-      {file && (
-        <AvatarEditor
-          ref={avatarEditor}
-          image={file}
-          width={91}
-          height={91}
-          border={100}
-          color={[255, 255, 255, 0.6]} // RGBA
-          scale={1.5}
-          rotate={0}
-        ></AvatarEditor>
-      )}
-      <input type="button" onClick={onSave} value="Guardar" />
-    </div>
+    <Grid
+      className={styles.root}
+      container
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      wrap="nowrap"
+    >
+      <Stepper orientation="vertical" nonLinear>
+        <Step active>
+          <StepLabel />
+          <StepContent>
+            <FilePicker
+              accept="image/*"
+              onSelectFile={setFile}
+              color="primary"
+              variant="contained"
+            >
+              Seleccionar archivo...
+            </FilePicker>
+          </StepContent>
+        </Step>
+        <Step active>
+          <StepLabel>Ajustar</StepLabel>
+          <StepContent className={styles.editorStep}>
+            {file && (
+              <>
+                <AvatarEditor
+                  ref={avatarEditor}
+                  image={file}
+                  width={91}
+                  height={91}
+                  border={50}
+                  color={[255, 255, 255, 0.6]} // RGBA
+                  scale={scale}
+                  rotate={0}
+                ></AvatarEditor>
+                <Slider
+                  value={scale}
+                  step={0.1}
+                  max={3}
+                  min={0.5}
+                  onChange={onScaleChange}
+                />
+              </>
+            )}
+          </StepContent>
+        </Step>
+        <Step active>
+          <StepLabel />
+          <StepContent>
+            <TextField
+              label="Nombre del archivo"
+              onChange={onFileNameChange}
+              value={fileName}
+            />
+          </StepContent>
+        </Step>
+        <Step active>
+          <StepLabel />
+          <StepContent>
+            <Button onClick={onSave} variant="contained" color="primary">
+              Guardar
+            </Button>
+          </StepContent>
+        </Step>
+      </Stepper>
+      <Grid
+        item
+        container
+        justifyContent="center"
+        alignItems="center"
+        className={styles.footer}
+        spacing={1}
+      >
+        <Grid item>
+          <Typography variant="caption" color="primary">
+            Gastón Mansilla - MIT Licence
+          </Typography>
+        </Grid>
+        <Grid item>
+          <a
+            href="https://github.com/gastonmansilla/image-normalizer"
+            rel="noreferrer"
+            target="_blank"
+          >
+            <GitHub color="primary" />
+          </a>
+        </Grid>
+      </Grid>
+    </Grid>
   );
 };
 
