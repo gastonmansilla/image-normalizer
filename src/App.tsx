@@ -48,8 +48,8 @@ const App = () => {
       return;
     }
     const scaled = avatarEditor.current.getImageScaledToCanvas();
-    const blob = scaled.toDataURL('jpeg');
-    downloadFile(blob, fileName, 'jpeg');
+    const blob = scaled.toDataURL('jpg');
+    downloadFile(blob, fileName, 'jpg');
   }, [file, fileName]);
 
   const onScaleChange = useCallback((_, value: number | number[]) => {
